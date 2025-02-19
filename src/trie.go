@@ -256,6 +256,15 @@ func (currentNode *node) getScanningMode(currentPrefixUpToThis []uint8) int {
 		return FINISHED_SCANNING
 	}
 
+	if currentNode.isMarkedInResponse() {
+		if currentNode.anyNotFinishedBGPSubnetsLeft(currentPrefixUpToThis) && scanAllBGP {
+			return BGP_PREFIX_MODE
+		} else {
+			debuglog("trie: finish scanning as marked in response %v/%v", convertIPFromFieldToNetIP(currentPrefixUpToThis, ipv6Scan), depth)
+			return FINISHED_SCANNING
+		}
+	}
+
 	var totalUnnanouncedLimitHit = currentNode.scansUnanounced+currentNode.scansAnounced >= totalNotroutedLimit
 	var defaultMode = SAMPLE_MODE
 	if totalUnnanouncedLimitHit {
@@ -265,21 +274,14 @@ func (currentNode *node) getScanningMode(currentPrefixUpToThis []uint8) int {
 	if noLimits {
 		return defaultMode
 	}
-	if currentNode.isMarkedInResponse() {
-		if currentNode.anyNotFinishedBGPSubnetsLeft(currentPrefixUpToThis) {
-			return BGP_PREFIX_MODE
-		} else {
-			debuglog("trie: finish scanning as marked in response %v/%v", convertIPFromFieldToNetIP(currentPrefixUpToThis, ipv6Scan), depth)
-			return FINISHED_SCANNING
-		}
-	}
+
 	var totalLimitHit = scanLimits[TOTAL][depth] != 0 && scanLimits[TOTAL][depth] <= currentNode.scansUnanounced+currentNode.scansAnounced
 	var announcedLimitHit = scanLimits[BGPANNOUNCED][depth] != 0 && scanLimits[BGPANNOUNCED][depth] <= currentNode.scansAnounced
 	var unannouncedLimitHit = scanLimits[UNANNOUNCED][depth] != 0 && scanLimits[UNANNOUNCED][depth] <= currentNode.scansUnanounced
 	if totalLimitHit || announcedLimitHit || unannouncedLimitHit {
 		var bgpLeft = currentNode.anyNotFinishedBGPSubnetsLeft(currentPrefixUpToThis)
 		if totalLimitHit || announcedLimitHit {
-			if bgpLeft {
+			if bgpLeft && scanAllBGP {
 				return BGP_PREFIX_MODE
 			} else {
 				debuglog("trie: finish scanning - limit hit %v %v --- %v/%v", announcedLimitHit, totalLimitHit, convertIPFromFieldToNetIP(currentPrefixUpToThis, ipv6Scan), depth)

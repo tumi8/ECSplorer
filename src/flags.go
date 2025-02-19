@@ -36,7 +36,7 @@ func parseFlags() {
 	flag.BoolVar(&versionf, "version", false, "show version string")
 	flag.BoolVar(&ipv6Scan, "6", false, "Perfom IPv6 scan using BGPANNOUNCED prefixes as seed")
 	flag.IntVar(&randomizeDepth, "randomize-depth", 32, "Randomize scan prefix selection after a given depth")
-	flag.BoolVar(&scanBGPOnly, "scanBGPOnly", false, "Only scan prefixes inside the BGPANNOUNCED prefix list")
+	flag.BoolVar(&scanAllBGP, "scanAllBGP", false, "Force scan all BGP announced prefixes from the prefix list")
 	flag.StringVar(&resolver, "resolver", "", "Set this to use a public resolver instead of the authoritative name server")
 	flag.StringVar(&configFile, "config-file", "", "Config file path")
 	timeoutDial = flag.Duration("timeout-dial", 2*time.Second, "Dial timeout")

@@ -116,7 +116,7 @@ var versionf bool
 var resolver string
 var ipv6Scan bool
 var randomizeDepth int
-var scanBGPOnly bool
+var scanAllBGP bool
 
 var timeoutDial *time.Duration
 var timeoutRead *time.Duration
