@@ -10,6 +10,8 @@ Code contributors:
 This ECSplorer implements the response-aware approach as presented in the paper [*ECSeptional DNS Data: Evaluating Nameserver ECS Deployments with Response-Aware Scanning*](https://arxiv.org/abs/2412.08478).
 The results presented in this paper where obtained using the scanning tools provided in this repository.
 
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.15390919.svg)](https://doi.org/10.5281/zenodo.15390919)
+
 **Authors:**
 Patrick Sattler, Johannes Zirngibl, Fahad Hilal, Oliver Gasser, Kevin Vermeulen, Georg Carle, Mattijs Jonker
 
