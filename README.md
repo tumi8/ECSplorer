@@ -24,6 +24,28 @@ cd src
 go build
 ```
 
+## Example uses
+
+### Response-aware Scanning
+In [`examples/scan-ecs.sh`](examples/scan-ecs.sh) and [`examples/scan-ecs.sh`](examples/scan-ecs-v6.sh) we added examples how we performed full address space response aware scans for domains. The scripts take two arguments: A prefix list and a domain list.
+
+To obtain the prefix list from a rib file (e.g., from [RIPE RIS](https://data.ris.ripe.net/rrc00/)) use the following command:
+
+```sh
+# IPv4 prefixes
+bgpdump -v -M ${ribfile} | cut -d \| -f 6 | grep -F "." > /tmp/v4-prefixes.txt
+
+# IPv6 prefixes
+bgpdump -v -M ${ribfile} | cut -d \| -f 6 | grep -F ":" > /tmp/v6-prefixes.txt
+```
+
+This uses the [bgpdump utility](https://github.com/RIPE-NCC/bgpdump).
+
+## Scanning a List of Prefixes
+
+In [`examples/scan-ecs-list.sh`](examples/scan-ecs-list.sh) we list the simple command to instruct the scanner to perform queries with the given prefixes.
+The arguments are now the prefix list to scan and a file containing `domain,nameserveripaddress` pairs which should be scanned. See also the sample inputs in [`examples/`](examples).
+
 ## Manual
 ```sh
 Usage of ecsplorer:
