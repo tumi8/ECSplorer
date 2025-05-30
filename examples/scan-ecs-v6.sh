@@ -1,6 +1,6 @@
 #!/bin/bash
 
-set -e
+set -eu
 
 BASEDIR="/tmp"
 
@@ -36,16 +36,16 @@ function merge {
 
 	first_lastl=$(tail -n1 ${first_file} | cut -d: -f1)
 
-	grep -e "^${first_lastl}:" ${second_file} >> ${first_file}
-	grep -v -e "^${first_lastl}:" ${second_file} >> ${second_file}.tmp
+	grep -e "^${first_lastl}:" ${second_file} >> ${first_file} || true
+	grep -v -e "^${first_lastl}:" ${second_file} >> ${second_file}.tmp || true
 	mv ${second_file}.tmp ${second_file}
 }
 
 mkdir -p ${OUTPUTDIR}
 
 declare -a scan_pids=()
-echo "scanning domain in ${DOMAINFILE}"
-for domain in $(cat ${DOMAINFILE}); do
+echo "scanning domain in ${DOMAINSFILE}"
+for domain in $(cat ${DOMAINSFILE}); do
 	echo "scanning ${domain}"
 	nsall=$(host -t ns ${domain})
 	cname=$(echo "${nsall}" | grep alias | tail -n 1 | cut -d " " -f 6)
@@ -83,6 +83,7 @@ for domain in $(cat ${DOMAINFILE}); do
 	split -d -l ${SPLIT_SIZE} ${INFILE} ${OUTPUTBASE}/$(basename ${INFILE}).split-
 
 	for i in $(seq 0 $(( ${numnsips} - 2 )) ); do
+		echo $i
 		merge ${OUTPUTBASE}/$(basename ${INFILE}).split-0${i} ${OUTPUTBASE}/$(basename ${INFILE}).split-0$(( $i + 1 ))
 	done
 
@@ -99,7 +100,7 @@ for domain in $(cat ${DOMAINFILE}); do
 		mkdir -p ${indexoutput}
 		echo "prefix file: ${pfile}" >> ${indexoutput}/metadata
 		echo "input file: ${ifile}" >> ${indexoutput}/metadata
-		${SCRIPTDIR}/ecsplorer -pf=${pfile}  -sf=${SCRIPTDIR}/specialPrefixes.csv  -pl 48 -if ${ifile} -ni=3 -query-rate=50 -6 -randomize-depth 32 -config-file ${SCRIPTDIR}/config.yml -out ${indexoutput}/results &> ${indexoutput}/scan.log &
+		${SCRIPTDIR}/ecsplorer -pf=${pfile}  -sf=$(dirname ${SCRIPTDIR})/utils/specialPrefixes.csv  -pl 48 -if ${ifile} -ni=3 -query-rate=50 -6 -randomize-depth 32 -config-file ${SCRIPTDIR}/sample-config.yml -out ${indexoutput}/results -scanAllBGP &> ${indexoutput}/scan.log &
 		scan_pids[${#scan_pids[@]}]=$!
 	done
 	sleep 5
