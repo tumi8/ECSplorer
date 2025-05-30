@@ -1,5 +1,6 @@
 #!/bin/bash
-set -e
+
+set -eu
 
 BASEDIR="/tmp"
 
@@ -8,14 +9,14 @@ OUTPUTDIR="${BASEDIR}/${DATEPATH}"
 
 echo "Writing results to ${OUTPUTDIR}"
 
-LATESTPFS=$1
+LATESTPFS=$2
 
 if [[ ! -e ${LATESTPFS} ]]; then
 	echo "No prefix file provided"
 	exit 1
 fi
 
-DOMAINSFILE=$2
+DOMAINSFILE=$1
 
 if [[ ! -e ${DOMAINSFILE} ]]; then
 	echo "No domain file provided"
@@ -37,16 +38,16 @@ function merge {
 	first_lastl=$(tail -n1 ${first_file} | cut -d. -f1)
 
 #	echo "removing ${first_lastl} from ${second_file}"
-	grep -e "^${first_lastl}." ${second_file} >> ${first_file}
-	grep -v -e "^${first_lastl}." ${second_file} >> ${second_file}.tmp
+	grep -e "^${first_lastl}." ${second_file} >> ${first_file} || true
+	grep -v -e "^${first_lastl}." ${second_file} >> ${second_file}.tmp || true
 	mv ${second_file}.tmp ${second_file}
 }
 
 mkdir -p ${OUTPUTDIR}
 
 declare -a scan_pids=()
-echo "scanning domain in $1"
-for domain in $(cat $1); do
+echo "scanning domain in ${DOMAINSFILE}"
+for domain in $(cat ${DOMAINSFILE}); do
 	echo "scanning ${domain}"
 	nsall=$(host -t ns ${domain})
 	cname=$(echo "${nsall}" | grep alias | tail -n 1 | cut -d " " -f 6)
@@ -91,7 +92,7 @@ for domain in $(cat $1); do
 		mkdir -p ${indexoutput}
 		echo "prefix file: ${pfile}" >> ${indexoutput}/metadata
 		echo "input file: ${ifile}" >> ${indexoutput}/metadata
-		${SCRIPTDIR}/ecsplorer -pf=${pfile} -sf=${SCRIPTDIR}/specialPrefixes.csv -if ${ifile} -pl 24 -ni=3 -query-rate=50 -out ${indexoutput}/results -randomizeDepth 8 &> ${indexoutput}/scan.log &
+		${SCRIPTDIR}/ecsplorer -config-file ${SCRIPTDIR}/sample-config.yml -pf ${pfile} -sf $(dirname ${SCRIPTDIR})/utils/specialPrefixes.csv -if ${ifile} -pl 24 -ni=3 -query-rate=50 -out ${indexoutput}/results &> ${indexoutput}/scan.log &
 		scan_pids[${#scan_pids[@]}]=$!
 	done
 done

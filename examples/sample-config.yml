@@ -1,0 +1,30 @@
+ipv6Limits:
+  bgprouted:
+    48: 1
+    40: 1
+    32: 1
+    29: 1
+    16: 1
+  notrouted:
+    32: 1
+    16: 1
+  total:
+    48: 1
+    40: 1
+    32: 1
+    29: 1
+    16: 1
+ipv4Limits:
+  bgpannounced:
+    24: 1
+    16: 1
+    8: 5
+  notrouted:
+    16: 1
+  total:
+    24: 1
+    16: 1
+    8: 1
+maxSpecialPrefixScans: 0
+scanResultsToFinish: 1
+totalNotroutedLimit: 0
