@@ -9,14 +9,14 @@ OUTPUTDIR="${BASEDIR}/${DATEPATH}"
 
 echo "Writing results to ${OUTPUTDIR}"
 
-LATESTPFS=$1
+LATESTPFS=$2
 
 if [[ ! -e ${LATESTPFS} ]]; then
 	echo "No prefix file provided"
 	exit 1
 fi
 
-DOMAINSFILE=$2
+DOMAINSFILE=$1
 
 if [[ ! -e ${DOMAINSFILE} ]]; then
 	echo "No domain file provided"
