@@ -55,6 +55,9 @@ func convertIPFromFieldToNetIP(ipAsField []uint8, isIPv6 bool) net.IP {
 func convertIPFromStringToKeyInt(ipAsString string) int64 {
 	ip := net.ParseIP(ipAsString)
 	var ipAsInt int64 = 0
+	if ip.To4() != nil {
+		ip = ip.To4()
+	}
 	for i, bytevalue := range ip {
 		if i >= 8 {
 			break
